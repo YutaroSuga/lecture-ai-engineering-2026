@@ -8,6 +8,9 @@
 「さっきの答えをもっと短く」のように前の発言を踏まえた質問もできる。
 空行・exit・quit・Ctrl+D で終了する。
 
+回答のあとに、その回の入力・出力トークン数を表示する。会話履歴も毎回まとめて
+送られるので、質問を重ねるほど入力トークン数が増えていくことを確かめよう。
+
 ツールは持たない「素の」呼び出し。
 講座に固有のことを聞くと、「分からない」と答えるか、一般論でもっともらしく答える
 （講座の実際とは違う）ことを確かめよう。
@@ -17,7 +20,7 @@
 import argparse
 
 from google import genai
-from google.genai import chats, errors
+from google.genai import chats, errors, types
 
 from app.config import MODEL, api_error_message, get_api_key
 
@@ -36,6 +39,22 @@ def start_chat(client: genai.Client) -> chats.Chat:
     return client.chats.create(model=MODEL)
 
 
+def format_usage(usage: types.GenerateContentResponseUsageMetadata | None) -> str:
+    """回答1回分の入力・出力トークン数を1行にまとめる。
+
+    思考（thinking）トークンも出力として課金されるので、出力に含めて内訳を添える。
+    """
+    if usage is None:
+        return "[tokens] 不明"
+    prompt = usage.prompt_token_count or 0
+    thoughts = usage.thoughts_token_count or 0
+    output = (usage.candidates_token_count or 0) + thoughts
+    line = f"[tokens] 入力: {prompt} / 出力: {output}"
+    if thoughts:
+        line += f"（うち思考: {thoughts}）"
+    return line
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="素のLLMに質問する（会話履歴つき）")
     parser.add_argument("question", nargs="?", default=DEFAULT_QUESTION)
@@ -50,7 +69,9 @@ def main() -> None:
         print(f"[質問] {question}\n")
         while True:
             try:
-                print(chat.send_message(question).text)
+                response = chat.send_message(question)
+                print(response.text)
+                print(f"\n{format_usage(response.usage_metadata)}")
             except errors.APIError as e:
                 # 一時的なエラーもあるので、会話は終わらせずに次の質問を受け付ける
                 print(api_error_message(e.code, e.message))
