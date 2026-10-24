@@ -17,3 +17,7 @@ dev = ["pytest>=8"]
 pythonpath = ["."]
 testpaths = ["tests"]
 filterwarnings = ["ignore::DeprecationWarning:pydantic_graph"]
+
+[tool.ruff.lint]
+# Windows 側のファイルシステムでは全ファイルが実行可能に見え、誤検知になるため
+ignore = ["EXE002"]
