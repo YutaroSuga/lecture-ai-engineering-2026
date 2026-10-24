@@ -1,8 +1,8 @@
 """ask.py のテスト。
 
 genai.Client を偽物に差し替えるので、実際のLLMは呼ばない。
-APIキーも利用枠も使わずに、「質問がモデルに渡り、回答が返るか」と
-「エラー時に日本語の説明を出して終了するか」を確かめられる。
+APIキーも利用枠も使わずに、「会話履歴を保ったまま続けて質問できるか」と
+「エラー時に日本語の説明を出すか」を確かめられる。
 """
 
 import sys
@@ -15,73 +15,136 @@ from app import ask as ask_module
 from app.config import MODEL
 
 
-class FakeModels:
-    def __init__(self, text="ダミーの回答", error=None):
-        self.text = text
-        self.error = error
-        self.calls = []
+class FakeChat:
+    """send_message のたびに履歴を積み上げる偽のチャット。"""
 
-    def generate_content(self, model, contents):
-        self.calls.append({"model": model, "contents": contents})
-        if self.error:
-            raise self.error
-        return SimpleNamespace(text=self.text)
+    # 先頭から順に、send_message で投げる例外（None なら成功）。テストで差し替える
+    initial_errors = ()
+
+    def __init__(self, model):
+        self.model = model
+        self.history = []
+        self.errors = list(self.initial_errors)
+
+    def send_message(self, message):
+        error = self.errors.pop(0) if self.errors else None
+        if error:
+            raise error
+        answer = f"回答{len(self.history) + 1}: {message}"
+        self.history.append((message, answer))
+        return SimpleNamespace(text=answer)
+
+
+class FakeChats:
+    def __init__(self):
+        self.created = []
+
+    def create(self, model):
+        chat = FakeChat(model)
+        self.created.append(chat)
+        return chat
+
+
+class FakeClient:
+    """genai.Client の偽物。with で使われ、抜けると closed になる。"""
+
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+        self.chats = FakeChats()
+        self.closed = False
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.closed = True
 
 
 @pytest.fixture
-def fake_models(monkeypatch):
-    """genai.Client を偽物に差し替え、呼び出し内容を記録する FakeModels を返す。"""
-    models = FakeModels()
-    client_kwargs = {}
+def fake_client(monkeypatch):
+    """genai.Client を偽物に差し替え、main() が作った FakeClient を後から参照できるようにする。"""
+    created = []
 
-    def fake_client(**kwargs):
-        client_kwargs.update(kwargs)
-        return SimpleNamespace(models=models)
+    def make_client(**kwargs):
+        client = FakeClient(**kwargs)
+        created.append(client)
+        return client
 
     monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
-    monkeypatch.setattr(ask_module.genai, "Client", fake_client)
-    models.client_kwargs = client_kwargs
-    return models
+    monkeypatch.setattr(ask_module.genai, "Client", make_client)
+    return lambda: created[-1]
 
 
-def test_ask_sends_question_and_returns_text(fake_models):
-    answer = ask_module.ask("LoRAとは何ですか？")
+def run_main(monkeypatch, argv, inputs):
+    """argv で main() を起動し、inputs を順に入力する。入力が尽きたら Ctrl+D 扱い。"""
+    monkeypatch.setattr(sys, "argv", ["ask", *argv])
+    it = iter(inputs)
 
-    assert answer == "ダミーの回答"
-    assert fake_models.calls == [{"model": MODEL, "contents": "LoRAとは何ですか？"}]
-    assert fake_models.client_kwargs == {"api_key": "dummy-key"}
+    def fake_input(prompt=""):
+        try:
+            return next(it)
+        except StopIteration:
+            raise EOFError from None
+
+    monkeypatch.setattr("builtins.input", fake_input)
+    ask_module.main()
 
 
-def test_ask_without_api_key_exits(monkeypatch):
+def test_main_without_api_key_exits(monkeypatch):
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     with pytest.raises(SystemExit, match="GEMINI_API_KEY"):
-        ask_module.ask("LoRAとは？")
+        run_main(monkeypatch, ["LoRAとは？"], [])
 
 
-def test_main_prints_question_and_answer(fake_models, monkeypatch, capsys):
-    monkeypatch.setattr(sys, "argv", ["ask", "RAGとは？"])
-    ask_module.main()
+def test_main_prints_question_and_answer(fake_client, monkeypatch, capsys):
+    run_main(monkeypatch, ["RAGとは？"], [])
 
     out = capsys.readouterr().out
     assert f"[model] {MODEL}" in out
     assert "[質問] RAGとは？" in out
-    assert "ダミーの回答" in out
-    assert fake_models.calls[0]["contents"] == "RAGとは？"
+    assert "回答1: RAGとは？" in out
+    (chat,) = fake_client().chats.created
+    assert chat.model == MODEL
+    assert fake_client().kwargs == {"api_key": "dummy-key"}
 
 
-def test_main_uses_default_question(fake_models, monkeypatch):
-    monkeypatch.setattr(sys, "argv", ["ask"])
-    ask_module.main()
+def test_main_uses_default_question(fake_client, monkeypatch):
+    run_main(monkeypatch, [], [])
 
-    assert fake_models.calls[0]["contents"] == ask_module.DEFAULT_QUESTION
+    (chat,) = fake_client().chats.created
+    assert chat.history[0][0] == ask_module.DEFAULT_QUESTION
 
 
-def test_main_api_error_prints_message_and_exits(fake_models, monkeypatch, capsys):
-    fake_models.error = errors.APIError(429, {"error": {"message": "quota"}})
-    monkeypatch.setattr(sys, "argv", ["ask", "LoRAとは？"])
+def test_main_keeps_history_across_questions(fake_client, monkeypatch, capsys):
+    run_main(monkeypatch, ["LoRAとは？"], ["もっと短く", "exit", "届かない質問"])
 
-    with pytest.raises(SystemExit) as exc_info:
-        ask_module.main()
+    # 1つのチャットに続けて送られ、exit 以降は送られない
+    (chat,) = fake_client().chats.created
+    assert [q for q, _ in chat.history] == ["LoRAとは？", "もっと短く"]
+    assert "回答2: もっと短く" in capsys.readouterr().out
 
-    assert exc_info.value.code == 1
-    assert "レート制限" in capsys.readouterr().out
+
+def test_main_closes_client_after_conversation(fake_client, monkeypatch):
+    run_main(monkeypatch, ["LoRAとは？"], ["もっと短く"])
+
+    assert fake_client().closed
+
+
+@pytest.mark.parametrize("word", ["", "exit", "quit", "  QUIT  "])
+def test_main_exits_on_exit_words(fake_client, monkeypatch, word):
+    run_main(monkeypatch, ["LoRAとは？"], [word, "届かない質問"])
+
+    (chat,) = fake_client().chats.created
+    assert len(chat.history) == 1
+
+
+def test_main_api_error_prints_message_and_continues(fake_client, monkeypatch, capsys):
+    error = errors.APIError(429, {"error": {"message": "quota"}})
+    monkeypatch.setattr(FakeChat, "initial_errors", (error,))
+    run_main(monkeypatch, ["LoRAとは？"], ["もう一度"])
+
+    out = capsys.readouterr().out
+    assert "レート制限" in out
+    # エラーのあとも会話は続き、次の質問には答える
+    (chat,) = fake_client().chats.created
+    assert [q for q, _ in chat.history] == ["もう一度"]
