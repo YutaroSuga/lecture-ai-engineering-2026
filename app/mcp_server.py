@@ -32,7 +32,9 @@ server.tool()(tools.search_glossary)
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="用語集 MCP サーバー")
-    parser.add_argument("--http", action="store_true", help="Streamable HTTP で起動する（既定は stdio）")
+    parser.add_argument(
+        "--http", action="store_true", help="Streamable HTTP で起動する（既定は stdio）"
+    )
     args = parser.parse_args()
     if args.http:
         print("MCP サーバーを http://127.0.0.1:8000/mcp で起動します（Ctrl+C で停止）")

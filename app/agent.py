@@ -16,9 +16,9 @@ import inspect
 import json
 from pathlib import Path
 
+from fastmcp import Client
 from pydantic_ai import Agent
 from pydantic_ai.exceptions import ModelHTTPError
-from fastmcp import Client
 from pydantic_ai.mcp import MCPToolset, StdioTransport
 from pydantic_ai.messages import ToolCallPart, ToolReturnPart
 from pydantic_ai.models.google import GoogleModel
@@ -66,7 +66,9 @@ def load_mcp_servers(config_path: Path = MCP_CONFIG) -> list[MCPToolset]:
         if "url" in spec:
             transport = spec["url"]
         else:
-            transport = StdioTransport(spec["command"], spec.get("args", []), env=spec.get("env"))
+            transport = StdioTransport(
+                spec["command"], spec.get("args", []), env=spec.get("env")
+            )
         toolsets.append(MCPToolset(Client(transport, mode="legacy")).prefixed(name))
     return toolsets
 
@@ -113,8 +115,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="学習支援エージェントに質問する")
     parser.add_argument("question", nargs="?")
     parser.add_argument("--trace", action="store_true", help="ツール呼び出しを表示する")
-    parser.add_argument("--mcp", action="store_true", help="第5回: ツールを MCP サーバー（app/mcp_servers.json）から受け取る")
-    parser.add_argument("--list-tools", action="store_true", help="モデルに見えるツール一覧を表示して終了する（APIキー不要）")
+    parser.add_argument(
+        "--mcp",
+        action="store_true",
+        help="第5回: ツールを MCP サーバー（app/mcp_servers.json）から受け取る",
+    )
+    parser.add_argument(
+        "--list-tools",
+        action="store_true",
+        help="モデルに見えるツール一覧を表示して終了する（APIキー不要）",
+    )
     args = parser.parse_args()
 
     target = build_mcp_agent() if args.mcp else agent

@@ -42,11 +42,13 @@ def search_glossary(query: str) -> str:
     exact = [e for e in glossary if q in _names(e)]
     # 「r」のような短い別名が何にでも当たらないよう、名前側が短いものは除く
     partial = [
-        e for e in glossary
+        e
+        for e in glossary
         if e not in exact and any(q in n or (len(n) >= 3 and n in q) for n in _names(e))
     ]
     in_definition = [
-        e for e in glossary
+        e
+        for e in glossary
         if e not in exact and e not in partial and q in _normalize(e["definition"])
     ]
     hits = (exact + partial + in_definition)[:MAX_RESULTS]
