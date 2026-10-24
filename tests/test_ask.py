@@ -164,6 +164,17 @@ def test_main_prints_token_counts(fake_client, monkeypatch, capsys):
     assert "[tokens] 入力: 20 / 出力: 5" in out
 
 
+def test_main_prints_response_time(fake_client, monkeypatch, capsys):
+    # perf_counter を送信前・送信後の順に呼ぶので、差がそのまま応答時間になる
+    ticks = iter([100.0, 101.5, 200.0, 200.25])
+    monkeypatch.setattr(ask_module.time, "perf_counter", lambda: next(ticks))
+    run_main(monkeypatch, ["LoRAとは？"], ["もっと短く"])
+
+    out = capsys.readouterr().out
+    assert "[time] 応答時間: 1.50 秒" in out
+    assert "[time] 応答時間: 0.25 秒" in out
+
+
 def test_format_usage_includes_thoughts_in_output():
     usage = SimpleNamespace(
         prompt_token_count=12, candidates_token_count=30, thoughts_token_count=8
