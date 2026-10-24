@@ -10,6 +10,7 @@
 
 回答のあとに、その回の入力・出力トークン数を表示する。会話履歴も毎回まとめて
 送られるので、質問を重ねるほど入力トークン数が増えていくことを確かめよう。
+あわせて、質問を送ってから回答が返るまでの応答時間（秒）も表示する。
 
 ツールは持たない「素の」呼び出し。
 講座に固有のことを聞くと、「分からない」と答えるか、一般論でもっともらしく答える
@@ -18,6 +19,7 @@
 """
 
 import argparse
+import time
 
 from google import genai
 from google.genai import chats, errors, types
@@ -69,9 +71,12 @@ def main() -> None:
         print(f"[質問] {question}\n")
         while True:
             try:
+                start = time.perf_counter()
                 response = chat.send_message(question)
+                elapsed = time.perf_counter() - start
                 print(response.text)
                 print(f"\n{format_usage(response.usage_metadata)}")
+                print(f"[time] 応答時間: {elapsed:.2f} 秒")
             except errors.APIError as e:
                 # 一時的なエラーもあるので、会話は終わらせずに次の質問を受け付ける
                 print(api_error_message(e.code, e.message))
