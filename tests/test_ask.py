@@ -32,7 +32,12 @@ class FakeChat:
             raise error
         answer = f"回答{len(self.history) + 1}: {message}"
         self.history.append((message, answer))
-        return SimpleNamespace(text=answer)
+        usage = SimpleNamespace(
+            prompt_token_count=10 * len(self.history),
+            candidates_token_count=5,
+            thoughts_token_count=None,
+        )
+        return SimpleNamespace(text=answer, usage_metadata=usage)
 
 
 class FakeChats:
@@ -148,3 +153,25 @@ def test_main_api_error_prints_message_and_continues(fake_client, monkeypatch, c
     # エラーのあとも会話は続き、次の質問には答える
     (chat,) = fake_client().chats.created
     assert [q for q, _ in chat.history] == ["もう一度"]
+
+
+def test_main_prints_token_counts(fake_client, monkeypatch, capsys):
+    run_main(monkeypatch, ["LoRAとは？"], ["もっと短く"])
+
+    out = capsys.readouterr().out
+    # 履歴が積み上がるので、2回目のほうが入力トークン数が多い
+    assert "[tokens] 入力: 10 / 出力: 5" in out
+    assert "[tokens] 入力: 20 / 出力: 5" in out
+
+
+def test_format_usage_includes_thoughts_in_output():
+    usage = SimpleNamespace(
+        prompt_token_count=12, candidates_token_count=30, thoughts_token_count=8
+    )
+    assert (
+        ask_module.format_usage(usage) == "[tokens] 入力: 12 / 出力: 38（うち思考: 8）"
+    )
+
+
+def test_format_usage_without_metadata():
+    assert ask_module.format_usage(None) == "[tokens] 不明"
