@@ -12,3 +12,6 @@ learning_log/
 
 # macOS
 .DS_Store
+
+# エディタの個人設定
+.vscode/
