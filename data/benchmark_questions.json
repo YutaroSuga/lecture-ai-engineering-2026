@@ -1,0 +1,55 @@
+{
+  "description": "scripts/benchmark.py で使う計測用の質問。短い答え・長い説明・コード・推論・英語など、出力の長さや性質が違うものを混ぜている。",
+  "questions": [
+    {
+      "id": "q01",
+      "category": "短答",
+      "question": "日本の首都はどこですか？一言で答えてください。"
+    },
+    {
+      "id": "q02",
+      "category": "用語説明",
+      "question": "LoRAとは何ですか？"
+    },
+    {
+      "id": "q03",
+      "category": "長い説明",
+      "question": "大規模言語モデルの「事前学習」と「ファインチューニング」の違いを、プログラミング初心者にも分かるように、例を交えて説明してください。"
+    },
+    {
+      "id": "q04",
+      "category": "コード生成",
+      "question": "Pythonで、リストから重複を取り除きつつ元の順序を保つ関数を書いてください。型ヒントと簡単なテストも付けてください。"
+    },
+    {
+      "id": "q05",
+      "category": "推論",
+      "question": "りんごが3個入った箱が4つと、みかんが5個入った袋が2つあります。そのうち、りんごを2個食べました。残りの果物は全部で何個ですか？考え方も示してください。"
+    },
+    {
+      "id": "q06",
+      "category": "要約",
+      "question": "次の文章を3つの箇条書きで要約してください。\n\nAIエージェントは、LLMがツールを呼び出しながら目的を達成する仕組みである。ユーザーの依頼を受けたLLMは、必要に応じて検索や計算などのツールを使い、その結果を見て次の行動を決める。この「考える→ツールを使う→結果を見る」の繰り返しをエージェントループと呼ぶ。便利な一方で、ツールの説明文が曖昧だと誤ったツールを選んだり、ループが終わらなくなったりすることがある。そのため、ツールの設計や、危険な操作の前に人間の確認を挟む仕組みが重要になる。"
+    },
+    {
+      "id": "q07",
+      "category": "翻訳",
+      "question": "次の英文を自然な日本語に翻訳してください。\n\nFine-tuning a large language model on a small, high-quality dataset can often outperform prompting alone, but it requires careful evaluation to avoid overfitting."
+    },
+    {
+      "id": "q08",
+      "category": "列挙",
+      "question": "LLMを使ったアプリをAPI経由で開発するときに注意すべき点を5つ挙げ、それぞれ1〜2文で説明してください。"
+    },
+    {
+      "id": "q09",
+      "category": "英語",
+      "question": "What is the difference between temperature and top-p in LLM sampling? Answer in about 100 words."
+    },
+    {
+      "id": "q10",
+      "category": "講座固有",
+      "question": "AIE2026の講座の宿題にある「3レベル」とは何ですか？"
+    }
+  ]
+}
