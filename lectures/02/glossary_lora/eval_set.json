@@ -1,0 +1,191 @@
+[
+  {
+    "kind": "same",
+    "question": "「LoRA」とは何ですか？",
+    "term": "LoRA",
+    "must_include": [
+      "低ランク"
+    ]
+  },
+  {
+    "kind": "same",
+    "question": "「トークン」とは何ですか？",
+    "term": "トークン",
+    "must_include": [
+      "最小単位"
+    ]
+  },
+  {
+    "kind": "same",
+    "question": "「量子化」とは何ですか？",
+    "term": "量子化",
+    "must_include": [
+      "ビット"
+    ]
+  },
+  {
+    "kind": "same",
+    "question": "「Codespaces secret」とは何ですか？",
+    "term": "Codespaces secret",
+    "must_include": [
+      "環境変数"
+    ]
+  },
+  {
+    "kind": "same",
+    "question": "「Pi」とは何ですか？",
+    "term": "Pi",
+    "must_include": [
+      "MIT"
+    ]
+  },
+  {
+    "kind": "same",
+    "question": "「既定モデル」とは何ですか？",
+    "term": "既定モデル",
+    "must_include": [
+      "gemini-3.5-flash-lite"
+    ]
+  },
+  {
+    "kind": "same",
+    "question": "「宿題の3レベル」とは何ですか？",
+    "term": "宿題の3レベル",
+    "must_include": [
+      "基礎",
+      "実装",
+      "発展"
+    ]
+  },
+  {
+    "kind": "same",
+    "question": "「lecNN-start タグ」とは何ですか？",
+    "term": "lecNN-start タグ",
+    "must_include": [
+      "タグ",
+      "ブランチ"
+    ]
+  },
+  {
+    "kind": "paraphrase",
+    "question": "LoRAでは、元のモデルの重みをどう扱いますか？",
+    "term": "LoRA",
+    "must_include": [
+      "固定"
+    ]
+  },
+  {
+    "kind": "paraphrase",
+    "question": "トークン数によって決まるものを挙げてください。",
+    "term": "トークン",
+    "must_include": [
+      "料金|レート制限|コンテキストウィンドウ"
+    ]
+  },
+  {
+    "kind": "paraphrase",
+    "question": "AIE2026の演習で標準的に使うモデルは何ですか？",
+    "term": "既定モデル",
+    "must_include": [
+      "gemini-3.5-flash-lite"
+    ]
+  },
+  {
+    "kind": "paraphrase",
+    "question": "Piのライセンスは何ですか？",
+    "term": "Pi",
+    "must_include": [
+      "MIT"
+    ]
+  },
+  {
+    "kind": "paraphrase",
+    "question": "APIキーは、どの環境変数から読み込みますか？",
+    "term": "APIキー",
+    "must_include": [
+      "GEMINI_API_KEY"
+    ]
+  },
+  {
+    "kind": "paraphrase",
+    "question": "宿題はいくつ取り組めば、その回は完了になりますか？",
+    "term": "宿題の3レベル",
+    "must_include": [
+      "1つ|一つ|ひとつ"
+    ]
+  },
+  {
+    "kind": "paraphrase",
+    "question": "前の回の演習が終わっていなくても、次の回の演習を始める方法はありますか？",
+    "term": "lecNN-start タグ",
+    "must_include": [
+      "start"
+    ]
+  },
+  {
+    "kind": "paraphrase",
+    "question": "Pydantic AIで、ツールの実行前に人の承認を挟むにはどう指定しますか？",
+    "term": "Human-in-the-loop",
+    "must_include": [
+      "requires_approval"
+    ]
+  },
+  {
+    "kind": "paraphrase",
+    "question": "過学習していることには、どうやって気づけますか？",
+    "term": "過学習",
+    "must_include": [
+      "検証"
+    ]
+  },
+  {
+    "kind": "paraphrase",
+    "question": "temperatureを低くすると、出力はどうなりますか？",
+    "term": "temperature",
+    "must_include": [
+      "安定"
+    ]
+  },
+  {
+    "kind": "unknown",
+    "question": "「RAG（検索拡張生成）」とは何ですか？",
+    "term": "RAG（検索拡張生成）",
+    "must_include": []
+  },
+  {
+    "kind": "unknown",
+    "question": "「エンベディング」とは何ですか？",
+    "term": "エンベディング",
+    "must_include": []
+  },
+  {
+    "kind": "unknown",
+    "question": "「Transformer」とは何ですか？",
+    "term": "Transformer",
+    "must_include": []
+  },
+  {
+    "kind": "unknown",
+    "question": "DPOについて簡単に説明してください。",
+    "term": "DPO",
+    "must_include": []
+  },
+  {
+    "kind": "unknown",
+    "question": "「lecNN-end タグ」とは何ですか？",
+    "term": "lecNN-end タグ",
+    "must_include": []
+  },
+  {
+    "kind": "unknown",
+    "question": "「Codespaces token」とは何ですか？",
+    "term": "Codespaces token",
+    "must_include": []
+  },
+  {
+    "kind": "unknown",
+    "question": "AIE2026の中間試験について説明してください。",
+    "term": "中間試験",
+    "must_include": []
+  }
+]

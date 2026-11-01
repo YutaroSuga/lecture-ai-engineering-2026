@@ -1,0 +1,81 @@
+{
+  "config": {
+    "base_model": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "seed": 42,
+    "num_train_epochs": 5,
+    "warmup_steps": 6,
+    "lr": 0.0002,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "max_seq_len": 512,
+    "max_new_tokens": 200,
+    "gen": {
+      "do_sample": false
+    },
+    "add_unknown_examples": false
+  },
+  "versions": {
+    "transformers": "5.18.0",
+    "peft": "0.21.1",
+    "trl": "1.14.2",
+    "torch": "2.11.0+cu130"
+  },
+  "method": "LoRA（量子化なし）",
+  "data": {
+    "train_file": "glossary_faq.txt",
+    "n_records": 116,
+    "n_terms": 58,
+    "n_train": 116,
+    "n_eval": {
+      "same": 8,
+      "paraphrase": 10,
+      "unknown": 7
+    }
+  },
+  "train_seconds": 309,
+  "train_steps": 75,
+  "final_loss": 0.21925580501556396,
+  "summaries": [
+    {
+      "label": "before",
+      "n": 25,
+      "acc_all": 0.08,
+      "acc_same": 0.125,
+      "acc_paraphrase": 0.1,
+      "acc_unknown": 0.0,
+      "seconds": 160.3
+    },
+    {
+      "label": "after",
+      "n": 25,
+      "acc_all": 0.24,
+      "acc_same": 0.625,
+      "acc_paraphrase": 0.1,
+      "acc_unknown": 0.0,
+      "seconds": 83.7
+    },
+    {
+      "label": "before_search",
+      "n": 25,
+      "acc_all": 0.56,
+      "acc_same": 0.875,
+      "acc_paraphrase": 0.7,
+      "acc_unknown": 0.0,
+      "seconds": 80.8
+    },
+    {
+      "label": "after_search",
+      "n": 25,
+      "acc_all": 0.4,
+      "acc_same": 0.5,
+      "acc_paraphrase": 0.5,
+      "acc_unknown": 0.143,
+      "seconds": 74.9
+    }
+  ],
+  "regressed": [
+    "Piのライセンスは何ですか？"
+  ],
+  "executed_training_myself": true
+}

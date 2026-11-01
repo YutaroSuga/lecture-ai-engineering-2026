@@ -1,0 +1,213 @@
+{
+  "summary": {
+    "label": "after",
+    "n": 25,
+    "acc_all": 0.24,
+    "acc_same": 0.625,
+    "acc_paraphrase": 0.1,
+    "acc_unknown": 0.0,
+    "seconds": 83.7
+  },
+  "rows": [
+    {
+      "question": "「LoRA」とは何ですか？",
+      "kind": "same",
+      "context": null,
+      "raw": "事前学習済みの重みは固定したまま、重みの更新分を2つの小さな行列の積（低ランク行列）で表し、その小さな行列だけを学習する手法。学習するパラメータが少なく、学習結果（更新行列）もメモリ使用量も小さい。",
+      "outcome": "correct",
+      "ok": true
+    },
+    {
+      "question": "「トークン」とは何ですか？",
+      "kind": "same",
+      "context": null,
+      "raw": "LLMがテキストを扱う最小単位。単語や文字の断片に分割される。APIの料金やレート制限は、このトークンごとの使用量で計算される。",
+      "outcome": "correct",
+      "ok": true
+    },
+    {
+      "question": "「量子化」とは何ですか？",
+      "kind": "same",
+      "context": null,
+      "raw": "モデルの重みを少ないビット数（例：16ビットから4ビット）で表し、メモリ使用量や計算量を減らす技術。精度は少し下がることがある。",
+      "outcome": "correct",
+      "ok": true
+    },
+    {
+      "question": "「Codespaces secret」とは何ですか？",
+      "kind": "same",
+      "context": null,
+      "raw": "GitHubのアカウント設定に接続する秘密の値。Codespacesのサーバー設定ファイルに書き込むと、サーバーが起動した時点でアクセスでき、Codespacesが起動した時点で公開になる。",
+      "outcome": "wrong",
+      "ok": false
+    },
+    {
+      "question": "「Pi」とは何ですか？",
+      "kind": "same",
+      "context": null,
+      "raw": "MCPのサーバーとして使う最小限の機能とポート数の合計値。APIキーや設定ファイルに依存しない。本講座では「Pi = 3」。",
+      "outcome": "wrong",
+      "ok": false
+    },
+    {
+      "question": "「既定モデル」とは何ですか？",
+      "kind": "same",
+      "context": null,
+      "raw": "AIE2026の演習と宿題で標準に使うモデルは gemini-3.5-flash-lite。無料枠のレート制限と講座運営の安定性を考えて選んでいる。環境変数 AIE_MODEL で他のモデルに切り替えてよく、自分で契約したAPIを使ってもよい。",
+      "outcome": "correct",
+      "ok": true
+    },
+    {
+      "question": "「宿題の3レベル」とは何ですか？",
+      "kind": "same",
+      "context": null,
+      "raw": "AIE2026の宿題の構成。AIEの基礎（機械学習の概念）、実装（Pythonでモデルを呼び出す）、発展（データやツールなどを使う）。3つは進めようとする理由と、どの程度自分で作業できるかを決めるためのもので、どれか1つに取り組めばその回の宿題は完了。",
+      "outcome": "correct",
+      "ok": true
+    },
+    {
+      "question": "「lecNN-start タグ」とは何ですか？",
+      "kind": "same",
+      "context": null,
+      "raw": "AIE2026の講座repoで、各回の演習開始時に適用するGitタグ。第1回演習はlecNN-start。",
+      "outcome": "wrong",
+      "ok": false
+    },
+    {
+      "question": "LoRAでは、元のモデルの重みをどう扱いますか？",
+      "kind": "paraphrase",
+      "context": null,
+      "raw": "LoRAでは、学習する重みをモデルの重みと分ける（低ランク、中ランク、高ランク）。モデルの重みを直接使うのは避けるため、低ランクと中ランクの重みを交換するだけで学習する。",
+      "outcome": "wrong",
+      "ok": false
+    },
+    {
+      "question": "トークン数によって決まるものを挙げてください。",
+      "kind": "paraphrase",
+      "context": null,
+      "raw": "LLMがテキストを扱う基本単位。単語、句子、トークンなどによって大きさが大きく変わる。APIの料金、レート制限、チャット上限はほとんどすべてトークン数で測られる。",
+      "outcome": "correct",
+      "ok": true
+    },
+    {
+      "question": "AIE2026の演習で標準的に使うモデルは何ですか？",
+      "kind": "paraphrase",
+      "context": null,
+      "raw": "GitHub Codespacesの演習環境に載るモデルは gpt-3.5-turbo。価格帯と安定性を考えて選ぶべき。",
+      "outcome": "wrong",
+      "ok": false
+    },
+    {
+      "question": "Piのライセンスは何ですか？",
+      "kind": "paraphrase",
+      "context": null,
+      "raw": "公開されているすべてのコードとドキュメントに同じCC0-1.0のライセンスを付ける。利用者はコードを見て、自分の使用目的で選択して使う。",
+      "outcome": "wrong",
+      "ok": false
+    },
+    {
+      "question": "APIキーは、どの環境変数から読み込みますか？",
+      "kind": "paraphrase",
+      "context": null,
+      "raw": "Pythonのrely-sdkで設定ファイル（.env）に書かれた環境変数から読み込む。設定ファイルに書き換えておくと、コードの書き方（どのパッケージを使うか、どの環境変数を使うか）を一人ひとりが決める。",
+      "outcome": "wrong",
+      "ok": false
+    },
+    {
+      "question": "宿題はいくつ取り組めば、その回は完了になりますか？",
+      "kind": "paraphrase",
+      "context": null,
+      "raw": "AIE2026の宿題は、各回の演習（講義の40分、宿題の30分、提出の10分）を3回に分けて取り組む。提出は提出時に提出欄に記入し、提出前に講義の録音や演習の録音を確認してから提出する。",
+      "outcome": "wrong",
+      "ok": false
+    },
+    {
+      "question": "前の回の演習が終わっていなくても、次の回の演習を始める方法はありますか？",
+      "kind": "paraphrase",
+      "context": null,
+      "raw": "宿題や提出で前の回の内容を確認し、理解が深まったら次の回の演習を始める。",
+      "outcome": "wrong",
+      "ok": false
+    },
+    {
+      "question": "Pydantic AIで、ツールの実行前に人の承認を挟むにはどう指定しますか？",
+      "kind": "paraphrase",
+      "context": null,
+      "raw": "Pydantic AIでは `ToolCallingSettings` として指定できる。設定値は JSON 形式で、引数の型と出力の型を自動で確認する。設定ファイルに書き込む例：\n\n```json\n{\n  \"tools\": [\n    {\n      \"name\": \"検索\",\n      \"description\": \"検索結果をリストで返すツール\",\n      \"parameters\": {\n        \"type\": \"object\",\n        \"required\": [\"query\"],\n        \"examples\": [\n          {\"query\": \"2026年6月の日程\"},\n          {\"query\": \"用語集の定義\"}\n        ],\n        \"schema\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"query\": {\n              \"type\": \"string\",\n              \"description\": \"検索_term\"\n            },\n            \"examples\": {\n              \"type\": \"array\",\n              \"",
+      "outcome": "wrong",
+      "ok": false
+    },
+    {
+      "question": "過学習していることには、どうやって気づけますか？",
+      "kind": "paraphrase",
+      "context": null,
+      "raw": "学習データにだけ過度に適合し、未知の入力に対する性能が落ちる状態。評価データに使う测试データで性能を測って気づく。",
+      "outcome": "wrong",
+      "ok": false
+    },
+    {
+      "question": "temperatureを低くすると、出力はどうなりますか？",
+      "kind": "paraphrase",
+      "context": null,
+      "raw": "出力の分布をより均一にする。同じ入力でも結果が異なるプロンプトやデータに、偶然で異なる結果が出るため、設定値を同じにするために同じ出力を期待させる。",
+      "outcome": "wrong",
+      "ok": false
+    },
+    {
+      "question": "「RAG（検索拡張生成）」とは何ですか？",
+      "kind": "unknown",
+      "context": null,
+      "raw": "LLMの出力を信頼せず、リソースで検索した結果をユーザーに渡して、ユーザーの指示で次の出力を生成する仕組み。検索結果の品質や頻度、出力の形式を制御できる。",
+      "outcome": "asserted",
+      "ok": false
+    },
+    {
+      "question": "「エンベディング」とは何ですか？",
+      "kind": "unknown",
+      "context": null,
+      "raw": "LLMが指示文（「ツールを呼び出す」という指示）を、実際のツールへ変換して受け取る仕組み。本講座ではPythonの関数として受け取る。",
+      "outcome": "asserted",
+      "ok": false
+    },
+    {
+      "question": "「Transformer」とは何ですか？",
+      "kind": "unknown",
+      "context": null,
+      "raw": "入力と出力の間の表示層として設計された大規模モデル。トークンレベルでの評価や、特定の言語や文脈での使用を可能にする。",
+      "outcome": "asserted",
+      "ok": false
+    },
+    {
+      "question": "DPOについて簡単に説明してください。",
+      "kind": "unknown",
+      "context": null,
+      "raw": "PPOの安定化で使う手法。次の行動を予測する時の重み（reweighting）を学習させ、結果の分布をより安定に作る。本講座の第5回で、DPOでLLMが「良い行動」を望むためのツールを学ぶ。",
+      "outcome": "asserted",
+      "ok": false
+    },
+    {
+      "question": "「lecNN-end タグ」とは何ですか？",
+      "kind": "unknown",
+      "context": null,
+      "raw": "AIE2026の講座repoで、各回の演習先をlecNN-end として名づてる設定。本回の演習は第3回（第2回の結果をlecNN-end/lecNN-end/001.py として使う）から進み、第4回の演習ではlecNN-end/lecNN-end/002.py になる。",
+      "outcome": "asserted",
+      "ok": false
+    },
+    {
+      "question": "「Codespaces token」とは何ですか？",
+      "kind": "unknown",
+      "context": null,
+      "raw": "GitHubのアカウント設定で渡す秘密の文字列。Codespacesは起動時にこのtokenを環境変数として読み、指定したrepoのbranchへのアクセス権限をもらい、利用者が入力したコマンドがrepoに届くまで静かに回線（HTTPS）を切る。利用者が自分でCodespacesを開き、このtokenをファイルに書き込むと、他人に渡すことはできず、書き込むまでログインが必要になる。",
+      "outcome": "asserted",
+      "ok": false
+    },
+    {
+      "question": "AIE2026の中間試験について説明してください。",
+      "kind": "unknown",
+      "context": null,
+      "raw": "6回の演習＋3回の宿題で構成される。演習は各回の講義の内容に沿った問題集に基づいており、宿題は講義の回数と演習の回数の合計で用意される。回数を数えてから宿題を提出すると、回数を超えた部分と不足する部分を同時に判断できる。",
+      "outcome": "asserted",
+      "ok": false
+    }
+  ]
+}
