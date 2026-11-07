@@ -59,3 +59,20 @@ def test_make_quiz_returns_question_and_answer_from_lecture():
 
 def test_make_quiz_reports_lecture_without_terms():
     assert "用語集にありません" in tools.make_quiz(0)
+
+
+def test_save_learning_log_appends_to_dated_file(tmp_path, monkeypatch):
+    monkeypatch.setattr(tools, "LOG_DIR", tmp_path / "learning_log")
+    assert "保存しました" in tools.save_learning_log("LoRA", "低ランク行列だけを学習する")
+    tools.save_learning_log("QLoRA", "量子化してメモリを節約する")
+
+    [log] = (tmp_path / "learning_log").glob("*.md")
+    text = log.read_text(encoding="utf-8")
+    assert text.index("LoRA") < text.index("QLoRA")  # 上書きせず追記する
+    assert "低ランク行列だけを学習する" in text
+
+
+def test_save_learning_log_rejects_empty_content(tmp_path, monkeypatch):
+    monkeypatch.setattr(tools, "LOG_DIR", tmp_path / "learning_log")
+    assert "保存しませんでした" in tools.save_learning_log("LoRA", "  ")
+    assert not (tmp_path / "learning_log").exists()
