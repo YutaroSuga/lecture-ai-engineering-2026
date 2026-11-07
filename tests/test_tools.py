@@ -46,3 +46,33 @@ def test_default_question_of_lecture1_is_answerable_from_glossary():
     assert "3レベル" in DEFAULT_QUESTION
     hits = json.loads(tools.search_glossary("3レベル"))
     assert hits[0]["term"] == "宿題の3レベル"
+
+
+def test_make_quiz_returns_question_and_answer_from_lecture():
+    lecture2 = {t["term"]: t["definition"] for t in tools.load_glossary() if t["lecture"] == 2}
+    for _ in range(10):
+        quiz = json.loads(tools.make_quiz(2))
+        term = quiz["question"].removeprefix("「").removesuffix("」の意味は？")
+        assert term in lecture2, quiz["question"]
+        assert quiz["answer"] == lecture2[term]
+
+
+def test_make_quiz_reports_lecture_without_terms():
+    assert "用語集にありません" in tools.make_quiz(0)
+
+
+def test_save_learning_log_appends_to_dated_file(tmp_path, monkeypatch):
+    monkeypatch.setattr(tools, "LOG_DIR", tmp_path / "learning_log")
+    assert "保存しました" in tools.save_learning_log("LoRA", "低ランク行列だけを学習する")
+    tools.save_learning_log("QLoRA", "量子化してメモリを節約する")
+
+    [log] = (tmp_path / "learning_log").glob("*.md")
+    text = log.read_text(encoding="utf-8")
+    assert text.index("LoRA") < text.index("QLoRA")  # 上書きせず追記する
+    assert "低ランク行列だけを学習する" in text
+
+
+def test_save_learning_log_rejects_empty_content(tmp_path, monkeypatch):
+    monkeypatch.setattr(tools, "LOG_DIR", tmp_path / "learning_log")
+    assert "保存しませんでした" in tools.save_learning_log("LoRA", "  ")
+    assert not (tmp_path / "learning_log").exists()
