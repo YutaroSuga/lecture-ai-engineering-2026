@@ -6,10 +6,13 @@
 
 import json
 import random
+from datetime import datetime
 from functools import cache
 from pathlib import Path
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+# 学習ログの保存先（個人の記録なので .gitignore で共有しないようにしてある）
+LOG_DIR = Path(__file__).resolve().parent.parent / "learning_log"
 MAX_RESULTS = 3
 
 
@@ -96,3 +99,22 @@ def make_quiz(lecture: int) -> str:
         {"question": f"「{entry['term']}」の意味は？", "answer": entry["definition"]},
         ensure_ascii=False,
     )
+
+
+def save_learning_log(title: str, content: str) -> str:
+    """学習の記録を learning_log/ フォルダに保存する（日付ごとのファイルに追記する）。
+
+    利用者が「今日の学習を記録して」「ログに残して」のように、学習の記録を残すよう
+    頼んだときだけ使う。title には記録の見出し（例: "LoRAとQLoRAの違い"）、
+    content には学んだ内容の要点を入れる。保存してよいかは、このツールを呼んだあとに
+    システムが利用者に確認するので、呼ぶ前に会話で確認を求めなくてよい。
+    """
+    title, content = title.strip(), content.strip()
+    if not title or not content:
+        return "見出しか本文が空なので保存しませんでした。title と content を指定してください。"
+    now = datetime.now()
+    LOG_DIR.mkdir(exist_ok=True)
+    path = LOG_DIR / f"{now:%Y-%m-%d}.md"
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(f"## {now:%H:%M} {title}\n\n{content}\n\n")
+    return f"{path.parent.name}/{path.name} に「{title}」を保存しました。"
