@@ -10,6 +10,9 @@ __pycache__/
 # 個人の学習ログ（第3回の宿題で作成）は共有しない
 learning_log/
 
+# ADK が実行時に作る会話の記録（session.db）は共有しない
+.adk/
+
 # macOS
 .DS_Store
 

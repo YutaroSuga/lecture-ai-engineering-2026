@@ -5,10 +5,12 @@ TestModel は実際のLLMを呼ばない偽モデルで、登録されたツー�
 「ツールが登録され、呼ばれ、結果がモデルに戻るか」を確かめられる。
 """
 
-from pydantic_ai import DeferredToolRequests
+import pytest
+from pydantic_ai import DeferredToolRequests, DeferredToolResults, ToolDenied
 from pydantic_ai.messages import ToolCallPart, ToolReturnPart
 from pydantic_ai.models.test import TestModel
 
+from app import tools
 from app.agent import agent
 
 BASE_TOOLS = {"search_glossary", "get_lecture_summary"}
@@ -40,3 +42,32 @@ def test_glossary_result_reaches_the_model():
         result = agent.run_sync("RAGとは？")
     returns = _parts(result, ToolReturnPart)
     assert returns and returns[0].tool_name == "search_glossary"
+
+
+@pytest.mark.parametrize("approved", [True, False])
+def test_save_learning_log_waits_for_approval(tmp_path, monkeypatch, approved):
+    """保存は承認待ちで一度止まり、承認したときだけファイルに書かれる。"""
+    log_dir = tmp_path / "learning_log"
+    monkeypatch.setattr(tools, "LOG_DIR", log_dir)
+    model = TestModel(call_tools=["save_learning_log"])
+    with agent.override(model=model):
+        result = agent.run_sync("学習ログに保存して")
+        assert isinstance(result.output, DeferredToolRequests)
+        [call] = result.output.approvals
+        assert call.tool_name == "save_learning_log"
+        assert not log_dir.exists()  # 承認前は保存されていない
+
+        decision = True if approved else ToolDenied("利用者が実行を許可しませんでした。")
+        result = agent.run_sync(
+            message_history=result.all_messages(),
+            deferred_tool_results=DeferredToolResults(approvals={call.tool_call_id: decision}),
+        )
+
+    assert isinstance(result.output, str)
+    [ret] = [p for p in _parts(result, ToolReturnPart) if p.tool_call_id == call.tool_call_id]
+    if approved:
+        assert "保存しました" in str(ret.content)
+        assert len(list(log_dir.glob("*.md"))) == 1
+    else:
+        assert "許可しませんでした" in str(ret.content)
+        assert not log_dir.exists()
