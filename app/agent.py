@@ -18,8 +18,8 @@
 import argparse
 import inspect
 import json
-from pathlib import Path
 from contextlib import nullcontext
+from pathlib import Path
 from time import perf_counter
 
 from fastmcp import Client
@@ -32,8 +32,8 @@ from pydantic_ai.models.test import TestModel
 from pydantic_ai.providers.google import GoogleProvider
 
 from app import tools
-from app.retrieval import run_full_context
 from app.config import MODEL, api_error_message, get_api_key
+from app.retrieval import run_full_context
 
 INSTRUCTIONS = """\
 あなたはAIエンジニアリング講座（AIE2026）の学習支援エージェントです。
@@ -179,18 +179,26 @@ def print_trace(result, elapsed_seconds: float | None = None) -> None:
                             print("  直下の候補（ページは先頭文のみ）:")
                         for child in data["children"]:
                             paths[child["id"]] = path + [child["title"]]
-                            page = f"PDF p.{child['page']} · " if "page" in child else ""
+                            page = (
+                                f"PDF p.{child['page']} · " if "page" in child else ""
+                            )
                             print(f"    - {child['id']} · {page}{child['title']}")
                             if "content" in child:
                                 print(f"      {child['content']}")
                         if not data["children"]:
-                            print(f"    （末端ページ・本文{len(node.get('content', ''))}文字を取得）")
+                            print(
+                                f"    （末端ページ・本文{len(node.get('content', ''))}文字を取得）"
+                            )
                 else:
-                    print(f"[tool return] {part.tool_name} -> {str(part.content)[:120]}…")
+                    print(
+                        f"[tool return] {part.tool_name} -> {str(part.content)[:120]}…"
+                    )
     usage = result.usage
     if elapsed_seconds is not None:
         print(f"[time] 回答完了まで {elapsed_seconds:.2f} 秒（検索・埋め込みを含む）")
-    print(f"[usage] 入力 {usage.input_tokens:,} tokens / 出力 {usage.output_tokens:,} tokens / モデル応答 {usage.requests} 回")
+    print(
+        f"[usage] 入力 {usage.input_tokens:,} tokens / 出力 {usage.output_tokens:,} tokens / モデル応答 {usage.requests} 回"
+    )
     cost = f"${usage.cost:.6f} USD" if usage.cost is not None else "算定不可"
     print(f"[cost] 生成APIの推定コスト: {cost}（埋め込み・索引構築分は含まない）")
 
@@ -200,19 +208,41 @@ def main() -> None:
     parser.add_argument("question", nargs="?")
     parser.add_argument("--trace", action="store_true", help="ツール呼び出しを表示する")
     modes = parser.add_mutually_exclusive_group()
-    modes.add_argument("--mcp", action="store_true", help="第5回: ツールを MCP サーバー（app/mcp_servers.json）から受け取る")
-    modes.add_argument("--graph", action="store_true", help="検索結果からグラフをたどり、候補ページを読んで答える")
-    modes.add_argument("--tree", action="store_true", help="目次をたどり、必要なページを読んで答える")
-    modes.add_argument("--full-context", action="store_true", help="検索せず、lectures.jsonの全資料を一度に渡す")
-    parser.add_argument("--list-tools", action="store_true", help="モデルに見えるツール一覧を表示して終了する（APIキー不要）")
+    modes.add_argument(
+        "--mcp",
+        action="store_true",
+        help="第5回: ツールを MCP サーバー（app/mcp_servers.json）から受け取る",
+    )
+    modes.add_argument(
+        "--graph",
+        action="store_true",
+        help="検索結果からグラフをたどり、候補ページを読んで答える",
+    )
+    modes.add_argument(
+        "--tree", action="store_true", help="目次をたどり、必要なページを読んで答える"
+    )
+    modes.add_argument(
+        "--full-context",
+        action="store_true",
+        help="検索せず、lectures.jsonの全資料を一度に渡す",
+    )
+    parser.add_argument(
+        "--list-tools",
+        action="store_true",
+        help="モデルに見えるツール一覧を表示して終了する（APIキー不要）",
+    )
     args = parser.parse_args()
 
     target = build_mcp_agent() if args.mcp else agent
     mode = nullcontext()
     if args.tree:
-        mode = target.override(instructions=TREE_INSTRUCTIONS, tools=[tools.browse_tree])
+        mode = target.override(
+            instructions=TREE_INSTRUCTIONS, tools=[tools.browse_tree]
+        )
     elif args.graph:
-        mode = target.override(instructions=GRAPH_INSTRUCTIONS, tools=[tools.search_graph])
+        mode = target.override(
+            instructions=GRAPH_INSTRUCTIONS, tools=[tools.search_graph]
+        )
     with mode:
         if args.list_tools:
             if args.full_context:
@@ -233,8 +263,11 @@ def main() -> None:
         try:
             if args.full_context:
                 result = run_full_context(
-                    target, args.question, model,
-                    instructions=FULL_CONTEXT_INSTRUCTIONS, prompt_template=FULL_CONTEXT_PROMPT,
+                    target,
+                    args.question,
+                    model,
+                    instructions=FULL_CONTEXT_INSTRUCTIONS,
+                    prompt_template=FULL_CONTEXT_PROMPT,
                 )
             else:
                 result = target.run_sync(args.question, model=model)

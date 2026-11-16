@@ -12,13 +12,32 @@ from scripts.build_rag_index import build_index
 @pytest.fixture
 def materials(tmp_path):
     source = tmp_path / "lectures.json"
-    source.write_text(json.dumps([
-        {"id": f"lec{n:02d}-main", "title": f"講義{n}", "content": [
-            {"section": "章", "content": [
-                {"id": f"lec{n:02d}-main-p001", "title": f"ページ{n}",
-                 "page": 1, "content": f"本文{n}"}]}]}
-        for n in (1, 2, 5)
-    ], ensure_ascii=False), encoding="utf-8")
+    source.write_text(
+        json.dumps(
+            [
+                {
+                    "id": f"lec{n:02d}-main",
+                    "title": f"講義{n}",
+                    "content": [
+                        {
+                            "section": "章",
+                            "content": [
+                                {
+                                    "id": f"lec{n:02d}-main-p001",
+                                    "title": f"ページ{n}",
+                                    "page": 1,
+                                    "content": f"本文{n}",
+                                }
+                            ],
+                        }
+                    ],
+                }
+                for n in (1, 2, 5)
+            ],
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
     return source, tmp_path / "index.sqlite3"
 
 

@@ -49,7 +49,9 @@ def test_default_question_of_lecture1_is_answerable_from_glossary():
 
 
 def test_make_quiz_returns_question_and_answer_from_lecture():
-    lecture2 = {t["term"]: t["definition"] for t in tools.load_glossary() if t["lecture"] == 2}
+    lecture2 = {
+        t["term"]: t["definition"] for t in tools.load_glossary() if t["lecture"] == 2
+    }
     for _ in range(10):
         quiz = json.loads(tools.make_quiz(2))
         term = quiz["question"].removeprefix("「").removesuffix("」の意味は？")
@@ -63,7 +65,9 @@ def test_make_quiz_reports_lecture_without_terms():
 
 def test_save_learning_log_appends_to_dated_file(tmp_path, monkeypatch):
     monkeypatch.setattr(tools, "LOG_DIR", tmp_path / "learning_log")
-    assert "保存しました" in tools.save_learning_log("LoRA", "低ランク行列だけを学習する")
+    assert "保存しました" in tools.save_learning_log(
+        "LoRA", "低ランク行列だけを学習する"
+    )
     tools.save_learning_log("QLoRA", "量子化してメモリを節約する")
 
     [log] = (tmp_path / "learning_log").glob("*.md")

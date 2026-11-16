@@ -127,8 +127,10 @@ def search_materials(query: str) -> str:
 
     queryに調べたい内容を指定する。
     """
-    from google.genai.errors import APIError
     import sqlite3
+
+    from google.genai.errors import APIError
+
     from app.retrieval import search
 
     try:
@@ -136,7 +138,9 @@ def search_materials(query: str) -> str:
     except (ValueError, FileNotFoundError, sqlite3.Error) as e:
         return json.dumps({"error": str(e), "results": []}, ensure_ascii=False)
     except APIError as e:
-        return json.dumps({"error": api_error_message(e.code), "results": []}, ensure_ascii=False)
+        return json.dumps(
+            {"error": api_error_message(e.code), "results": []}, ensure_ascii=False
+        )
 
 
 def browse_tree(node_id: str | None = None) -> str:
@@ -158,7 +162,9 @@ def search_graph(query: str) -> str:
     queryに調べたい内容を指定する。
     """
     import sqlite3
+
     from google.genai.errors import APIError
+
     from app.retrieval import search_graph as search
 
     try:

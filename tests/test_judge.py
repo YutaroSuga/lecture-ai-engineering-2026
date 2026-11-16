@@ -19,17 +19,27 @@ from app.judge import (
     summarize,
 )
 
-INSTRUCTOR_LABELS = judge.ROOT / "lectures" / "04" / "reference" / "labels_instructor.jsonl"
+INSTRUCTOR_LABELS = (
+    judge.ROOT / "lectures" / "04" / "reference" / "labels_instructor.jsonl"
+)
 
 
 def test_lecture_mark_is_checked_by_code():
     assert check_lecture_mark("LoRA は…\n\n関係する回：第2回") == "pass"
-    assert check_lecture_mark("第2回で扱う LoRA は…\n\n以上です。") == "fail"  # 末尾に無ければ fail
+    assert (
+        check_lecture_mark("第2回で扱う LoRA は…\n\n以上です。") == "fail"
+    )  # 末尾に無ければ fail
     assert check_lecture_mark("") == "fail"
 
 
 def test_overall_requires_all_required_criteria():
-    base = {"grounding": "pass", "scope": "pass", "hint": "pass", "lecture_mark": "pass", "clarity": "fail"}
+    base = {
+        "grounding": "pass",
+        "scope": "pass",
+        "hint": "pass",
+        "lecture_mark": "pass",
+        "clarity": "fail",
+    }
     assert overall(base) == "pass"  # 分かりやすさは総合に入れない
     assert overall({**base, "hint": "fail"}) == "fail"
     assert overall({**base, "grounding": "unsure"}) == "unsure"
@@ -42,7 +52,9 @@ def test_cases_and_rubric_are_consistent():
     for c in cases:
         assert c["question"] and c["answer"] and c["reference"]["expected"]
     rubric = DEFAULT_RUBRIC.read_text(encoding="utf-8")
-    for key, name in ALL_CRITERIA[:-1]:  # 回の表示はコードで判定するので rubric には書かない
+    for key, name in ALL_CRITERIA[
+        :-1
+    ]:  # 回の表示はコードで判定するので rubric には書かない
         assert f"{name}（{key}）" in rubric
     labels = load_labels(INSTRUCTOR_LABELS)
     assert set(labels) == {c["id"] for c in cases}
@@ -63,8 +75,12 @@ def test_judge_pipeline_with_fake_model():
     summary = summarize(cases, verdicts, labels)
     assert summary["n"] == 10
     # unsure にした項目は一致率の分母から外れ、要確認に入る
-    excluded = sum(p["total"] - p["compared"] for p in summary["per_criterion"].values())
+    excluded = sum(
+        p["total"] - p["compared"] for p in summary["per_criterion"].values()
+    )
     assert excluded == len(summary["review"])
-    assert summary["coverage"]["covered"] + len({r["id"] for r in summary["review"]}) == 10
+    assert (
+        summary["coverage"]["covered"] + len({r["id"] for r in summary["review"]}) == 10
+    )
     for m in summary["mismatches"]:
         assert m["kind"] in ("見逃し", "過検出")

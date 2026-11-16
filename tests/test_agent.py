@@ -34,13 +34,24 @@ def test_base_tools_are_registered_and_called(monkeypatch):
     called = {p.tool_name for p in _parts(result, ToolCallPart)}
     assert BASE_TOOLS <= called
     # 承認が必要なツール（requires_approval=True）は、実行されずに承認待ちになるので戻り値が無い
-    waiting = len(result.output.approvals) if isinstance(result.output, DeferredToolRequests) else 0
-    assert len(_parts(result, ToolReturnPart)) + waiting == len(_parts(result, ToolCallPart))
+    waiting = (
+        len(result.output.approvals)
+        if isinstance(result.output, DeferredToolRequests)
+        else 0
+    )
+    assert len(_parts(result, ToolReturnPart)) + waiting == len(
+        _parts(result, ToolCallPart)
+    )
     assert result.output
 
 
 def test_material_result_reaches_the_model(monkeypatch):
-    hit = {"page_id": "lec02-main-p052", "lecture": 2, "page": 52, "content": "元の重みは固定"}
+    hit = {
+        "page_id": "lec02-main-p052",
+        "lecture": 2,
+        "page": 52,
+        "content": "元の重みは固定",
+    }
     monkeypatch.setattr("app.retrieval.search", lambda *args, **kwargs: [hit])
     model = TestModel(call_tools=["search_materials"])
     with agent.override(model=model):
@@ -63,14 +74,20 @@ def test_save_learning_log_waits_for_approval(tmp_path, monkeypatch, approved):
         assert call.tool_name == "save_learning_log"
         assert not log_dir.exists()  # 承認前は保存されていない
 
-        decision = True if approved else ToolDenied("利用者が実行を許可しませんでした。")
+        decision = (
+            True if approved else ToolDenied("利用者が実行を許可しませんでした。")
+        )
         result = agent.run_sync(
             message_history=result.all_messages(),
-            deferred_tool_results=DeferredToolResults(approvals={call.tool_call_id: decision}),
+            deferred_tool_results=DeferredToolResults(
+                approvals={call.tool_call_id: decision}
+            ),
         )
 
     assert isinstance(result.output, str)
-    [ret] = [p for p in _parts(result, ToolReturnPart) if p.tool_call_id == call.tool_call_id]
+    [ret] = [
+        p for p in _parts(result, ToolReturnPart) if p.tool_call_id == call.tool_call_id
+    ]
     if approved:
         assert "保存しました" in str(ret.content)
         assert len(list(log_dir.glob("*.md"))) == 1
