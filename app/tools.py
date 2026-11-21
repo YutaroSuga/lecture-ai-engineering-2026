@@ -131,10 +131,11 @@ def search_materials(query: str) -> str:
 
     from google.genai.errors import APIError
 
-    from app.retrieval import search
+    # 第5回 宿題（実装）: AIE_RAG_NEIGHBORS を設定すると、前後のページの本文も付ける
+    from app.retrieval import search_with_neighbors
 
     try:
-        return json.dumps({"results": search(query)}, ensure_ascii=False)
+        return json.dumps({"results": search_with_neighbors(query)}, ensure_ascii=False)
     except (ValueError, FileNotFoundError, sqlite3.Error) as e:
         return json.dumps({"error": str(e), "results": []}, ensure_ascii=False)
     except APIError as e:
