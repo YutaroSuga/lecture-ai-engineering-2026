@@ -24,6 +24,7 @@ from app.config import (
     RAG_DB,
     RAG_DOCUMENT_IDS,
     RAG_GRAPH,
+    RAG_NEIGHBOR_PAGES,
     RAG_SOURCE,
     RAG_TOP_K,
     RAG_TREE,
@@ -177,6 +178,41 @@ def search(query: str) -> list[dict]:
         return [dict(row) for row in rows]
 
 
+def add_neighbor_pages(
+    hits: list[dict], window: int, pages: list[dict] | None = None
+) -> list[dict]:
+    """検索結果の各ページの直後に、同じ資料の前後window ページを付け足す。
+
+    すでに検索結果にあるページや、先に付け足したページは重複させない。
+    付け足したページには distance を付けず、どのページの隣かを neighbor_of に入れる。
+    """
+    if window <= 0:
+        return hits
+    pages = load_pages(RAG_SOURCE) if pages is None else pages
+    position = {page["page_id"]: i for i, page in enumerate(pages)}
+    seen = {hit["page_id"] for hit in hits}
+    results = []
+    for hit in hits:
+        results.append(hit)
+        i = position.get(hit["page_id"])
+        if i is None:
+            continue
+        for j in range(i - window, i + window + 1):
+            if j == i or not 0 <= j < len(pages):
+                continue
+            page = pages[j]
+            if page["document_id"] != hit.get("document_id") or page["page_id"] in seen:
+                continue
+            seen.add(page["page_id"])
+            results.append({**page, "neighbor_of": hit["page_id"]})
+    return results
+
+
+def search_with_neighbors(query: str, window: int = RAG_NEIGHBOR_PAGES) -> list[dict]:
+    """ベクトル検索の結果に、前後window ページの本文を付けて返す。"""
+    return add_neighbor_pages(search(query), window)
+
+
 def search_graph(query: str) -> dict:
     """ベクトル検索を入口に、前後ページと共通用語で候補を広げる。"""
     pages = {page["page_id"]: page for page in load_pages(RAG_SOURCE)}
@@ -263,9 +299,20 @@ if __name__ == "__main__":
         description="エージェントを使わず、講義資料の検索だけを実行する"
     )
     parser.add_argument("query", help="調べたい内容")
+    parser.add_argument(
+        "--neighbors",
+        type=int,
+        default=RAG_NEIGHBOR_PAGES,
+        help="検索結果の前後何ページを付けるか（既定は AIE_RAG_NEIGHBORS、未設定なら0）",
+    )
     args = parser.parse_args()
-    for i, result in enumerate(search(args.query), 1):
-        print(f"\n{'=' * 60}\n検索結果 {i}\n{'=' * 60}")
+    for i, result in enumerate(search_with_neighbors(args.query, args.neighbors), 1):
+        label = (
+            f"（{result['neighbor_of']} の隣）"
+            if "neighbor_of" in result
+            else f"（距離 {result['distance']:.3f}）"
+        )
+        print(f"\n{'=' * 60}\n検索結果 {i} {label}\n{'=' * 60}")
         print(f"講義: {result['document_title']}")
         print(f"章: {result['section']}")
         print(f"タイトル: {result['title']}")
