@@ -26,7 +26,8 @@
       "documentationUrl": "https://aistudio.google.com/apikey"
     }
   },
-  "postCreateCommand": "pipx install uv && uv sync --frozen",
+  // ローカルの devcontainer 用: リポジトリ直下の .env（git 管理外）を新しいターミナルで読み込む
+  "postCreateCommand": "pipx install uv && uv sync --frozen && echo '. ${containerWorkspaceFolder}/.devcontainer/load-dotenv.sh' >> ~/.bashrc",
   "customizations": {
     "vscode": {
       "extensions": ["ms-python.python", "GitHub.copilot-chat", "hashicorp.terraform"],
