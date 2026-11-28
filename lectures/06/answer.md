@@ -4,11 +4,15 @@
 
 <!-- [tool call] の行は、表示された行をそのまま貼り付けてください。終わらなかった STEP は、空欄のままでかまいません。 -->
 
-- STEP 1 のツールの名前：
-- STEP 2 の [tool call]：
-- STEP 3 の [tool call]：
+- STEP 1 のツールの名前：glossary_search_glossary
+- STEP 2 の [tool call]：[tool call]   glossary_search_glossary({'query': '3レベル'})
+- STEP 3 の [tool call]：[tool call]   fetch_fetch({'url': 'https://modelcontextprotocol.io/'})
 - STEP 4 の [tool call]：
+    1. [tool call]   aws_aws___search_documentation({'search_phrase': 'Amazon S3 バージョニング 概要'})
+    2. [tool call]   aws_aws___search_documentation({'search_phrase': '"Versioning" site:docs.aws.amazon.com/AmazonS3/latest/userguide'})
 - 気づき・疑問：
+    - 気づき：STEP 4 では、ツールが 2 回呼ばれた。1 回目は日本語の検索語、2 回目は英語の `"Versioning"` に `site:` を付けた検索語だった。1 回目の結果が足りないと判断して、モデルが自分で検索語を変えて呼び直したように見える。どのツールを何回呼ぶかは、モデルが決めていることが分かった
+    - 気づき：設定ファイルに数行足すだけで、エージェントのコードを変えずにツールが増えた。その分、出所の分からないサーバーを足すと、説明文や返す内容がそのままモデルに渡るので、足す前の確認が大事だと感じた
 
 ## 宿題
 
